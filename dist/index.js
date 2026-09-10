@@ -36217,7 +36217,11 @@ function traceWorkflowRun(workflowRun, jobs, jobAnnotations, prLabels) {
     const tracer = trace.getTracer("otel-cicd-action");
     const startTime = new Date(workflowRun.run_started_at ?? workflowRun.created_at);
     const attributes = workflowRunToAttributes(workflowRun, prLabels);
-    return tracer.startActiveSpan(workflowRun.name ?? workflowRun.display_title, { attributes, root: true, startTime }, (rootSpan) => {
+    return tracer.startActiveSpan(workflowRun.name ?? workflowRun.display_title, 
+    // The pipeline run span kind SHOULD be SERVER, while its task run spans —
+    // the job and step spans below — SHOULD be INTERNAL, which is the default.
+    // https://opentelemetry.io/docs/specs/semconv/cicd/cicd-spans/#pipeline-run
+    { attributes, kind: SpanKind.SERVER, root: true, startTime }, (rootSpan) => {
         recordConclusion(rootSpan, workflowRun.conclusion);
         // "Queued" span represent the time between the workflow has been started_at and
         // the first job has been picked up by a runner. Jobs are not guaranteed to be

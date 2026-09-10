@@ -1,5 +1,5 @@
 import type { components } from "@octokit/openapi-types";
-import { type Attributes, context, trace } from "@opentelemetry/api";
+import { type Attributes, context, SpanKind, trace } from "@opentelemetry/api";
 import {
   ATTR_CICD_PIPELINE_ACTION_NAME,
   ATTR_CICD_PIPELINE_NAME,
@@ -34,7 +34,10 @@ function traceWorkflowRun(
 
   return tracer.startActiveSpan(
     workflowRun.name ?? workflowRun.display_title,
-    { attributes, root: true, startTime },
+    // The pipeline run span kind SHOULD be SERVER, while its task run spans —
+    // the job and step spans below — SHOULD be INTERNAL, which is the default.
+    // https://opentelemetry.io/docs/specs/semconv/cicd/cicd-spans/#pipeline-run
+    { attributes, kind: SpanKind.SERVER, root: true, startTime },
     (rootSpan) => {
       recordConclusion(rootSpan, workflowRun.conclusion);
 

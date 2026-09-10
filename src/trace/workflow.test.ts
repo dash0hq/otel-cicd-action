@@ -1,5 +1,5 @@
 import type { components } from "@octokit/openapi-types";
-import { context, trace } from "@opentelemetry/api";
+import { context, SpanKind, trace } from "@opentelemetry/api";
 import { AsyncLocalStorageContextManager } from "@opentelemetry/context-async-hooks";
 import { BasicTracerProvider, InMemorySpanExporter, SimpleSpanProcessor } from "@opentelemetry/sdk-trace-base";
 import { traceWorkflowRun } from "./workflow";
@@ -74,6 +74,31 @@ describe("traceWorkflowRun", () => {
 
     const queued = exporter.getFinishedSpans().find((span) => span.name === "Queued");
     expect(queued?.endTime[0]).toBe(Date.parse("2026-01-01T00:00:00Z") / 1000);
+  });
+
+  it("gives the pipeline run span kind SERVER and its task runs kind INTERNAL", () => {
+    const job = {
+      ...fakeJob("a job", "2026-01-01T00:00:04Z"),
+      steps: [
+        {
+          name: "a step",
+          status: "completed",
+          conclusion: "success",
+          number: 1,
+          started_at: "2026-01-01T00:00:04Z",
+          completed_at: "2026-01-01T00:00:05Z",
+        },
+      ],
+    } as unknown as components["schemas"]["job"];
+
+    traceWorkflowRun(fakeWorkflowRun({}), [job], {}, {});
+
+    const spans = exporter.getFinishedSpans();
+    const byName = (name: string) => spans.find((span) => span.name === name);
+
+    expect(byName("Test workflow")?.kind).toBe(SpanKind.SERVER);
+    expect(byName("a job")?.kind).toBe(SpanKind.INTERNAL);
+    expect(byName("a step")?.kind).toBe(SpanKind.INTERNAL);
   });
 
   it("does not create a Queued span when there are no jobs", () => {

@@ -258,7 +258,7 @@
   traceState: undefined,
   name: 'Lint Pull Request Titles',
   id: '991f2b235b36cb2c',
-  kind: 0,
+  kind: 1,
   timestamp: 1769706975000000,
   duration: 36000000,
   attributes: {

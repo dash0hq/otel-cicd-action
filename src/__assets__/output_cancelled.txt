@@ -395,7 +395,7 @@
   traceState: undefined,
   name: 'Build & Test',
   id: '991f2b235b36cb2c',
-  kind: 0,
+  kind: 1,
   timestamp: 1753871431000000,
   duration: 72000000,
   attributes: {
