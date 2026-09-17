@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Switch top-level pipeline run span kind from `INTERNAL` to `SERVER`, according to
+  OTel semconv: https://opentelemetry.io/docs/specs/semconv/cicd/cicd-spans/#pipeline-run
+
 ## [4.1.1] - 2026-08-14
 
 ### Changed
