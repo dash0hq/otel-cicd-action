@@ -36121,14 +36121,20 @@ function traceJob(job, annotations) {
         info(`Job ${job.id} is not completed yet`);
         return;
     }
-    const startTime = new Date(job.started_at);
+    const createTime = new Date(job.created_at);
+    const startTime = new Date(Math.max(createTime.getTime(), new Date(job.started_at).getTime()));
     const completedTime = new Date(job.completed_at);
     const attributes = {
         ...jobToAttributes(job),
         ...annotationsToAttributes(annotations),
     };
-    tracer.startActiveSpan(job.name, { attributes, startTime }, (span) => {
+    tracer.startActiveSpan(job.name, { attributes, startTime: createTime }, (span) => {
         recordConclusion(span, job.conclusion);
+        // "Queued" span represents the time the job waited for a runner to pick it up
+        if (startTime > createTime) {
+            const queuedSpan = tracer.startSpan("Queued", { startTime: createTime });
+            queuedSpan.end(startTime);
+        }
         for (const step of job.steps ?? []) {
             traceStep(step);
         }
@@ -36223,7 +36229,7 @@ function traceWorkflowRun(workflowRun, jobs, jobAnnotations, prLabels) {
     // https://opentelemetry.io/docs/specs/semconv/cicd/cicd-spans/#pipeline-run
     { attributes, kind: SpanKind.SERVER, root: true, startTime }, (rootSpan) => {
         recordConclusion(rootSpan, workflowRun.conclusion);
-        // "Queued" span represent the time between the workflow has been started_at and
+        // "Queued" span represents the time between when the workflow was started and
         // the first job has been picked up by a runner. Jobs are not guaranteed to be
         // ordered by start time, so take the earliest one.
         const jobStartTimes = jobs.map((job) => new Date(job.started_at).getTime()).filter(Number.isFinite);

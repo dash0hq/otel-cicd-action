@@ -54,13 +54,22 @@ describe("traceWorkflowRun", () => {
     context.disable();
   });
 
+  // Jobs have their own "Queued" spans, so only match the one parented to the workflow span
+  function getWorkflowQueuedSpan() {
+    const spans = exporter.getFinishedSpans();
+    const root = spans.find((span) => span.name === "Test workflow");
+    return spans.find(
+      (span) => span.name === "Queued" && span.parentSpanContext?.spanId === root?.spanContext().spanId
+    );
+  }
+
   it("ends the Queued span at the earliest job start time", () => {
     // Jobs are deliberately not ordered by start time: the API does not guarantee it
     const jobs = [fakeJob("late job", "2026-01-01T00:00:10Z"), fakeJob("early job", "2026-01-01T00:00:04Z")];
 
     traceWorkflowRun(fakeWorkflowRun({}), jobs, {}, {});
 
-    const queued = exporter.getFinishedSpans().find((span) => span.name === "Queued");
+    const queued = getWorkflowQueuedSpan();
     expect(queued).toBeDefined();
     expect(queued?.startTime[0]).toBe(Date.parse("2026-01-01T00:00:00Z") / 1000);
     expect(queued?.endTime[0]).toBe(Date.parse("2026-01-01T00:00:04Z") / 1000);
@@ -72,7 +81,7 @@ describe("traceWorkflowRun", () => {
 
     traceWorkflowRun(fakeWorkflowRun({}), jobs, {}, {});
 
-    const queued = exporter.getFinishedSpans().find((span) => span.name === "Queued");
+    const queued = getWorkflowQueuedSpan();
     expect(queued?.endTime[0]).toBe(Date.parse("2026-01-01T00:00:00Z") / 1000);
   });
 
@@ -101,9 +110,24 @@ describe("traceWorkflowRun", () => {
     expect(byName("a step")?.kind).toBe(SpanKind.INTERNAL);
   });
 
+  it("creates one Queued span for the workflow and one for each queued job", () => {
+    const jobs = [fakeJob("late job", "2026-01-01T00:00:10Z"), fakeJob("early job", "2026-01-01T00:00:04Z")];
+
+    traceWorkflowRun(fakeWorkflowRun({}), jobs, {}, {});
+
+    const spans = exporter.getFinishedSpans();
+    const queuedSpans = spans.filter((span) => span.name === "Queued");
+    const queuedSpanParents = queuedSpans.map((queuedSpan) =>
+      spans.find((span) => span.spanContext().spanId === queuedSpan.parentSpanContext?.spanId)
+    );
+    expect(queuedSpanParents.map((span) => span?.name).sort()).toEqual(
+      ["Test workflow", "late job", "early job"].sort()
+    );
+  });
+
   it("does not create a Queued span when there are no jobs", () => {
     traceWorkflowRun(fakeWorkflowRun({}), [], {}, {});
 
-    expect(exporter.getFinishedSpans().find((span) => span.name === "Queued")).toBeUndefined();
+    expect(getWorkflowQueuedSpan()).toBeUndefined();
   });
 });

@@ -62,8 +62,45 @@
     traceState: undefined
   },
   traceState: undefined,
-  name: 'Set up job',
+  name: 'Queued',
   id: '664492c803762481',
+  kind: 0,
+  timestamp: 1769641491000000,
+  duration: 1000000,
+  attributes: {},
+  status: { code: 0 },
+  events: [],
+  links: []
+}
+{
+  resource: {
+    attributes: {
+      'service.name': 'otel-cicd-action',
+      'telemetry.sdk.language': 'nodejs',
+      'telemetry.sdk.name': 'opentelemetry',
+      'telemetry.sdk.version': '2.9.0',
+      'service.instance.id': 'biomejs/biome/94297729/21458831126/1',
+      'service.namespace': 'biomejs/biome',
+      'service.version': 'e2666f5864e5f11de8a071856f0804e6bab0fd8f',
+      'extra.attribute': '1',
+      key2: 'value2'
+    }
+  },
+  instrumentationScope: {
+    name: 'otel-cicd-action',
+    version: undefined,
+    schemaUrl: undefined
+  },
+  traceId: '329e58aa53cec7a2beadd2fd0a85c388',
+  parentSpanContext: {
+    traceId: '329e58aa53cec7a2beadd2fd0a85c388',
+    spanId: '6ec088f795976e9f',
+    traceFlags: 1,
+    traceState: undefined
+  },
+  traceState: undefined,
+  name: 'Set up job',
+  id: '53f65cc5dd869993',
   kind: 0,
   timestamp: 1769641521000000,
   duration: 2000000,
@@ -107,7 +144,7 @@
   },
   traceState: undefined,
   name: 'Run amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50',
-  id: '53f65cc5dd869993',
+  id: '3be338eeb09a8294',
   kind: 0,
   timestamp: 1769641523000000,
   duration: 5000000,
@@ -152,7 +189,7 @@
   },
   traceState: undefined,
   name: 'Complete job',
-  id: '3be338eeb09a8294',
+  id: '39fe919f122d52fc',
   kind: 0,
   timestamp: 1769641528000000,
   duration: 0,
@@ -198,8 +235,8 @@
   name: 'Validate PR title',
   id: '6ec088f795976e9f',
   kind: 0,
-  timestamp: 1769641492000000,
-  duration: 37000000,
+  timestamp: 1769641491000000,
+  duration: 38000000,
   attributes: {
     'cicd.pipeline.task.name': 'Validate PR title',
     'cicd.pipeline.task.run.id': 61806350920,
