@@ -63,6 +63,10 @@ files:
     target: dash0/miscellaneous/manage-as-code/manage-cicd-observability-as-code.md
     title: Manage CI/CD Observability as Code
     description: Add OpenTelemetry observability to your CI/CD pipelines with the Dash0 GitHub Action.
+    tags:
+      - github-actions
+      - auto-instrumentation
+      - opentelemetry-instrumentation
     transformations:
       - description: add auto-generated warning comment
         type: prepend

@@ -19,8 +19,9 @@ name: Synchronize CI/CD Action docs to dash0.com/docs
 # - On pushes to main it runs the real sync, opening (or updating) a pull request in the target repository.
 # It can also be run manually (workflow_dispatch), where dry-run defaults to false.
 #
-# The sync targets the default documentation repository (dash0hq/dash0-website) and directory configured in
-# sync-docs-action; there is nothing source-specific about them, so they are not overridden here.
+# The target repository and directory are supplied from the SYNC_DOCUMENTATION_TARGET_REPOSITORY and
+# SYNC_DOCUMENTATION_TARGET_DIRECTORY secrets. sync-docs-action v0.4.0 removed its defaults for both, so the
+# (non-public) target repo name and its internal layout are not hardcoded here.
 #
 # Authentication to the target repository is done via the DASH0_DOCS_REPO_GITHUB_PAT secret. This must be a
 # fine-grained personal access token scoped to the target repository with the following repository permissions:
@@ -64,59 +65,15 @@ jobs:
       - name: checkout otel-cicd-action
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6
 
-      # Dry run: verify the transformations still apply cleanly without touching the target repository. The composite
-      # action always opens a PR, so the dry run checks the action out and invokes its transformation engine directly.
-      - name: check out sync-docs-action for the dry run
-        if: ${{ env.DRY_RUN == 'true' }}
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6
-        with:
-          repository: dash0hq/sync-docs-action
-          ref: v0.2.0
-          path: .sync-docs-action
-
-      - name: set up Node.js for the dry run
-        if: ${{ env.DRY_RUN == 'true' }}
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
-        with:
-          node-version-file: .sync-docs-action/.nvmrc
-
-      # The transformation engine imports third-party packages (yaml, etc.), so its dependencies must be installed
-      # before it can run. The composite action does this itself during the real sync; the dry run drives the engine
-      # directly, so it has to mirror the action's own pnpm install.
-      - name: read the pnpm version required by sync-docs-action
-        id: pnpm-version
-        if: ${{ env.DRY_RUN == 'true' }}
-        run: |
-          version=$(node -p "require('./.sync-docs-action/package.json').packageManager.replace('pnpm@', '')")
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-
-      - name: set up pnpm for the dry run
-        if: ${{ env.DRY_RUN == 'true' }}
-        uses: pnpm/action-setup@8912a9102ac27614460f54aedde9e1e7f9aec20d # v6.0.5
-        with:
-          version: ${{ steps.pnpm-version.outputs.version }}
-          run_install: false
-
-      - name: install sync-docs-action dependencies for the dry run
-        if: ${{ env.DRY_RUN == 'true' }}
-        working-directory: .sync-docs-action
-        run: pnpm install --frozen-lockfile
-
-      - name: apply doc transformations (dry run)
-        if: ${{ env.DRY_RUN == 'true' }}
-        run: |
-          node .sync-docs-action/packages/transformation-engine/src/apply-transformations.ts \
-            . \
-            .github/workflows/sync-docs/transformations.yaml \
-            "${RUNNER_TEMP}/transformed-docs"
-          echo "This is a dry run: the doc transformations applied successfully, no pull request is created."
-
-      # Real sync: delegate the transform + checkout + copy + PR flow to the shared composite action.
+      # Single invocation for both modes. On a dry run the action applies the transformations, then stops before
+      # touching the target repository; the target-side inputs are ignored, so they can be supplied unconditionally.
       - name: synchronize docs to the website
-        if: ${{ env.DRY_RUN != 'true' }}
-        uses: dash0hq/sync-docs-action@9c3d55819e9b8143e695f8f7d4b6e00189ba40a3 # v0.2.0
+        uses: dash0hq/sync-docs-action@c30aaaaa93f3f8a88b9f9e3acd31cfff3e086954 # v0.6.0
         with:
+          dry-run: ${{ env.DRY_RUN }}
           transformations-file: .github/workflows/sync-docs/transformations.yaml
+          target-repository: ${{ secrets.SYNC_DOCUMENTATION_TARGET_REPOSITORY }}
+          target-directory: ${{ secrets.SYNC_DOCUMENTATION_TARGET_DIRECTORY }}
           target-github-token: ${{ secrets.DASH0_DOCS_REPO_GITHUB_PAT }}
           pr-branch: sync-otel-cicd-action-docs
           pr-title: "docs: synchronize CI/CD Action documentation"
