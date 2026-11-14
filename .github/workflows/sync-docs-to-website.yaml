@@ -68,7 +68,7 @@ jobs:
       # Single invocation for both modes. On a dry run the action applies the transformations, then stops before
       # touching the target repository; the target-side inputs are ignored, so they can be supplied unconditionally.
       - name: synchronize docs to the website
-        uses: dash0hq/sync-docs-action@4c9eef64cafde3358467a43f54be95f228fa2a42 # TODO: replace with the v0.6.0 release commit SHA (dash0hq/sync-docs-action#12)
+        uses: dash0hq/sync-docs-action@c30aaaaa93f3f8a88b9f9e3acd31cfff3e086954 # v0.6.0
         with:
           dry-run: ${{ env.DRY_RUN }}
           transformations-file: .github/workflows/sync-docs/transformations.yaml
