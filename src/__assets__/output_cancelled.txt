@@ -57,6 +57,43 @@
   traceId: '329e58aa53cec7a2beadd2fd0a85c388',
   parentSpanContext: {
     traceId: '329e58aa53cec7a2beadd2fd0a85c388',
+    spanId: '6ec088f795976e9f',
+    traceFlags: 1,
+    traceState: undefined
+  },
+  traceState: undefined,
+  name: 'Queued',
+  id: '664492c803762481',
+  kind: 0,
+  timestamp: 1753871431000000,
+  duration: 9000000,
+  attributes: {},
+  status: { code: 0 },
+  events: [],
+  links: []
+}
+{
+  resource: {
+    attributes: {
+      'service.name': 'otel-cicd-action',
+      'telemetry.sdk.language': 'nodejs',
+      'telemetry.sdk.name': 'opentelemetry',
+      'telemetry.sdk.version': '2.9.0',
+      'service.instance.id': 'step-security/skip-duplicate-actions/76151565/16620109074/1',
+      'service.namespace': 'step-security/skip-duplicate-actions',
+      'service.version': '6f96b263f472444725e0d2122722ce7140cf3bdb',
+      'extra.attribute': '1',
+      key2: 'value2'
+    }
+  },
+  instrumentationScope: {
+    name: 'otel-cicd-action',
+    version: undefined,
+    schemaUrl: undefined
+  },
+  traceId: '329e58aa53cec7a2beadd2fd0a85c388',
+  parentSpanContext: {
+    traceId: '329e58aa53cec7a2beadd2fd0a85c388',
     spanId: '991f2b235b36cb2c',
     traceFlags: 1,
     traceState: undefined
@@ -65,8 +102,8 @@
   name: 'pre_job',
   id: '6ec088f795976e9f',
   kind: 0,
-  timestamp: 1753871440000000,
-  duration: 16000000,
+  timestamp: 1753871431000000,
+  duration: 25000000,
   attributes: {
     'cicd.pipeline.task.name': 'pre_job',
     'cicd.pipeline.task.run.id': 47022208955,
@@ -124,16 +161,53 @@
   traceId: '329e58aa53cec7a2beadd2fd0a85c388',
   parentSpanContext: {
     traceId: '329e58aa53cec7a2beadd2fd0a85c388',
+    spanId: '53f65cc5dd869993',
+    traceFlags: 1,
+    traceState: undefined
+  },
+  traceState: undefined,
+  name: 'Queued',
+  id: '3be338eeb09a8294',
+  kind: 0,
+  timestamp: 1753871431000000,
+  duration: 8000000,
+  attributes: {},
+  status: { code: 0 },
+  events: [],
+  links: []
+}
+{
+  resource: {
+    attributes: {
+      'service.name': 'otel-cicd-action',
+      'telemetry.sdk.language': 'nodejs',
+      'telemetry.sdk.name': 'opentelemetry',
+      'telemetry.sdk.version': '2.9.0',
+      'service.instance.id': 'step-security/skip-duplicate-actions/76151565/16620109074/1',
+      'service.namespace': 'step-security/skip-duplicate-actions',
+      'service.version': '6f96b263f472444725e0d2122722ce7140cf3bdb',
+      'extra.attribute': '1',
+      key2: 'value2'
+    }
+  },
+  instrumentationScope: {
+    name: 'otel-cicd-action',
+    version: undefined,
+    schemaUrl: undefined
+  },
+  traceId: '329e58aa53cec7a2beadd2fd0a85c388',
+  parentSpanContext: {
+    traceId: '329e58aa53cec7a2beadd2fd0a85c388',
     spanId: '991f2b235b36cb2c',
     traceFlags: 1,
     traceState: undefined
   },
   traceState: undefined,
   name: 'skip_individual_steps_job',
-  id: '664492c803762481',
+  id: '53f65cc5dd869993',
   kind: 0,
-  timestamp: 1753871439000000,
-  duration: 17000000,
+  timestamp: 1753871431000000,
+  duration: 25000000,
   attributes: {
     'cicd.pipeline.task.name': 'skip_individual_steps_job',
     'cicd.pipeline.task.run.id': 47022208967,
@@ -191,16 +265,53 @@
   traceId: '329e58aa53cec7a2beadd2fd0a85c388',
   parentSpanContext: {
     traceId: '329e58aa53cec7a2beadd2fd0a85c388',
+    spanId: '39fe919f122d52fc',
+    traceFlags: 1,
+    traceState: undefined
+  },
+  traceState: undefined,
+  name: 'Queued',
+  id: 'fe4443837212946c',
+  kind: 0,
+  timestamp: 1753871431000000,
+  duration: 5000000,
+  attributes: {},
+  status: { code: 0 },
+  events: [],
+  links: []
+}
+{
+  resource: {
+    attributes: {
+      'service.name': 'otel-cicd-action',
+      'telemetry.sdk.language': 'nodejs',
+      'telemetry.sdk.name': 'opentelemetry',
+      'telemetry.sdk.version': '2.9.0',
+      'service.instance.id': 'step-security/skip-duplicate-actions/76151565/16620109074/1',
+      'service.namespace': 'step-security/skip-duplicate-actions',
+      'service.version': '6f96b263f472444725e0d2122722ce7140cf3bdb',
+      'extra.attribute': '1',
+      key2: 'value2'
+    }
+  },
+  instrumentationScope: {
+    name: 'otel-cicd-action',
+    version: undefined,
+    schemaUrl: undefined
+  },
+  traceId: '329e58aa53cec7a2beadd2fd0a85c388',
+  parentSpanContext: {
+    traceId: '329e58aa53cec7a2beadd2fd0a85c388',
     spanId: '991f2b235b36cb2c',
     traceFlags: 1,
     traceState: undefined
   },
   traceState: undefined,
   name: 'build',
-  id: '53f65cc5dd869993',
+  id: '39fe919f122d52fc',
   kind: 0,
-  timestamp: 1753871436000000,
-  duration: 31000000,
+  timestamp: 1753871431000000,
+  duration: 36000000,
   attributes: {
     'cicd.pipeline.task.name': 'build',
     'cicd.pipeline.task.run.id': 47022208973,
@@ -259,16 +370,53 @@
   traceId: '329e58aa53cec7a2beadd2fd0a85c388',
   parentSpanContext: {
     traceId: '329e58aa53cec7a2beadd2fd0a85c388',
+    spanId: 'bd80124f69923ec3',
+    traceFlags: 1,
+    traceState: undefined
+  },
+  traceState: undefined,
+  name: 'Queued',
+  id: 'd32c379c60a00c7f',
+  kind: 0,
+  timestamp: 1753871431000000,
+  duration: 8000000,
+  attributes: {},
+  status: { code: 0 },
+  events: [],
+  links: []
+}
+{
+  resource: {
+    attributes: {
+      'service.name': 'otel-cicd-action',
+      'telemetry.sdk.language': 'nodejs',
+      'telemetry.sdk.name': 'opentelemetry',
+      'telemetry.sdk.version': '2.9.0',
+      'service.instance.id': 'step-security/skip-duplicate-actions/76151565/16620109074/1',
+      'service.namespace': 'step-security/skip-duplicate-actions',
+      'service.version': '6f96b263f472444725e0d2122722ce7140cf3bdb',
+      'extra.attribute': '1',
+      key2: 'value2'
+    }
+  },
+  instrumentationScope: {
+    name: 'otel-cicd-action',
+    version: undefined,
+    schemaUrl: undefined
+  },
+  traceId: '329e58aa53cec7a2beadd2fd0a85c388',
+  parentSpanContext: {
+    traceId: '329e58aa53cec7a2beadd2fd0a85c388',
     spanId: '991f2b235b36cb2c',
     traceFlags: 1,
     traceState: undefined
   },
   traceState: undefined,
   name: 'private_action',
-  id: '3be338eeb09a8294',
+  id: 'bd80124f69923ec3',
   kind: 0,
-  timestamp: 1753871439000000,
-  duration: 48000000,
+  timestamp: 1753871431000000,
+  duration: 56000000,
   attributes: {
     'cicd.pipeline.task.name': 'private_action',
     'cicd.pipeline.task.run.id': 47022208986,
@@ -326,16 +474,53 @@
   traceId: '329e58aa53cec7a2beadd2fd0a85c388',
   parentSpanContext: {
     traceId: '329e58aa53cec7a2beadd2fd0a85c388',
+    spanId: 'c889ebc1b96c92da',
+    traceFlags: 1,
+    traceState: undefined
+  },
+  traceState: undefined,
+  name: 'Queued',
+  id: '76a45425d9782571',
+  kind: 0,
+  timestamp: 1753871457000000,
+  duration: 5000000,
+  attributes: {},
+  status: { code: 0 },
+  events: [],
+  links: []
+}
+{
+  resource: {
+    attributes: {
+      'service.name': 'otel-cicd-action',
+      'telemetry.sdk.language': 'nodejs',
+      'telemetry.sdk.name': 'opentelemetry',
+      'telemetry.sdk.version': '2.9.0',
+      'service.instance.id': 'step-security/skip-duplicate-actions/76151565/16620109074/1',
+      'service.namespace': 'step-security/skip-duplicate-actions',
+      'service.version': '6f96b263f472444725e0d2122722ce7140cf3bdb',
+      'extra.attribute': '1',
+      key2: 'value2'
+    }
+  },
+  instrumentationScope: {
+    name: 'otel-cicd-action',
+    version: undefined,
+    schemaUrl: undefined
+  },
+  traceId: '329e58aa53cec7a2beadd2fd0a85c388',
+  parentSpanContext: {
+    traceId: '329e58aa53cec7a2beadd2fd0a85c388',
     spanId: '991f2b235b36cb2c',
     traceFlags: 1,
     traceState: undefined
   },
   traceState: undefined,
   name: 'main_job',
-  id: '39fe919f122d52fc',
+  id: 'c889ebc1b96c92da',
   kind: 0,
-  timestamp: 1753871462000000,
-  duration: 40000000,
+  timestamp: 1753871457000000,
+  duration: 45000000,
   attributes: {
     'cicd.pipeline.task.name': 'main_job',
     'cicd.pipeline.task.run.id': 47022240005,

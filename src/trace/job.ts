@@ -29,15 +29,22 @@ function traceJob(job: components["schemas"]["job"], annotations?: components["s
     return;
   }
 
-  const startTime = new Date(job.started_at);
+  const createTime = new Date(job.created_at);
+  const startTime = new Date(Math.max(createTime.getTime(), new Date(job.started_at).getTime()));
   const completedTime = new Date(job.completed_at);
   const attributes = {
     ...jobToAttributes(job),
     ...annotationsToAttributes(annotations),
   };
 
-  tracer.startActiveSpan(job.name, { attributes, startTime }, (span) => {
+  tracer.startActiveSpan(job.name, { attributes, startTime: createTime }, (span) => {
     recordConclusion(span, job.conclusion);
+
+    // "Queued" span represents the time the job waited for a runner to pick it up
+    if (startTime > createTime) {
+      const queuedSpan = tracer.startSpan("Queued", { startTime: createTime });
+      queuedSpan.end(startTime);
+    }
 
     for (const step of job.steps ?? []) {
       traceStep(step);

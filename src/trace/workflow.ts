@@ -41,7 +41,7 @@ function traceWorkflowRun(
     (rootSpan) => {
       recordConclusion(rootSpan, workflowRun.conclusion);
 
-      // "Queued" span represent the time between the workflow has been started_at and
+      // "Queued" span represents the time between when the workflow was started and
       // the first job has been picked up by a runner. Jobs are not guaranteed to be
       // ordered by start time, so take the earliest one.
       const jobStartTimes = jobs.map((job) => new Date(job.started_at).getTime()).filter(Number.isFinite);
