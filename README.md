@@ -53,6 +53,7 @@ jobs:
           otlpHeaders: ${{ secrets.OTLP_HEADERS }}
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           runId: ${{ github.event.workflow_run.id }}
+          runAttempt: ${{ github.event.workflow_run.run_attempt }}
 ```
 
 ### Inside an existing workflow
@@ -141,6 +142,7 @@ man-in-the-middle attacks. Only use it with a trusted internal endpoint.
 | otelServiceName        | OpenTelemetry service name                                                                                               | false    | `<The name of the exported workflow>` | `Build CI`                                                        |
 | githubToken            | The repository token with Workflow permissions. Required for private repos                                               | false    |                                       | `${{ secrets.GITHUB_TOKEN }}`                                     |
 | runId                  | Workflow Run ID to Export                                                                                                | false    | env.GITHUB_RUN_ID                     | `${{ github.event.workflow_run.id }}`                             |
+| runAttempt             | Attempt of the workflow run to export                                                                                    | false    | latest attempt                        | `${{ github.event.workflow_run.run_attempt }}`                    |
 | extraAttributes        | Extra resource attributes to add to each span                                                                            | false    |                                       | `extra.attribute=1,key2=value2`                                   |
 | otlpInsecureSkipVerify | Disable TLS certificate verification for the OTLP exporter. Only use this with trusted endpoints.                        | false    | `false`                               | `true`                                                            |
 

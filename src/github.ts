@@ -23,7 +23,15 @@ async function mapWithConcurrency<T, R>(items: T[], fn: (item: T) => Promise<R>)
   return results;
 }
 
-async function getWorkflowRun(context: Context, octokit: Octokit, runId: number) {
+async function getWorkflowRun(context: Context, octokit: Octokit, runId: number, runAttempt?: number) {
+  if (runAttempt !== undefined) {
+    const res = await octokit.rest.actions.getWorkflowRunAttempt({
+      ...context.repo,
+      run_id: runId,
+      attempt_number: runAttempt,
+    });
+    return res.data;
+  }
   const res = await octokit.rest.actions.getWorkflowRun({
     ...context.repo,
     run_id: runId,
@@ -31,7 +39,16 @@ async function getWorkflowRun(context: Context, octokit: Octokit, runId: number)
   return res.data;
 }
 
-async function listJobsForWorkflowRun(context: Context, octokit: Octokit, runId: number) {
+async function listJobsForWorkflowRun(context: Context, octokit: Octokit, runId: number, runAttempt?: number) {
+  if (runAttempt !== undefined) {
+    // The jobs of exactly this attempt, whatever attempts have started since.
+    return await octokit.paginate(octokit.rest.actions.listJobsForWorkflowRunAttempt, {
+      ...context.repo,
+      run_id: runId,
+      attempt_number: runAttempt,
+      per_page: 100,
+    });
+  }
   return await octokit.paginate(octokit.rest.actions.listJobsForWorkflowRun, {
     ...context.repo,
     run_id: runId,

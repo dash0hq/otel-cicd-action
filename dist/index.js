@@ -33678,14 +33678,31 @@ async function mapWithConcurrency(items, fn) {
     await Promise.all(Array.from({ length: Math.min(MAX_CONCURRENT_REQUESTS, items.length) }, worker));
     return results;
 }
-async function getWorkflowRun(context, octokit, runId) {
+async function getWorkflowRun(context, octokit, runId, runAttempt) {
+    if (runAttempt !== undefined) {
+        const res = await octokit.rest.actions.getWorkflowRunAttempt({
+            ...context.repo,
+            run_id: runId,
+            attempt_number: runAttempt,
+        });
+        return res.data;
+    }
     const res = await octokit.rest.actions.getWorkflowRun({
         ...context.repo,
         run_id: runId,
     });
     return res.data;
 }
-async function listJobsForWorkflowRun(context, octokit, runId) {
+async function listJobsForWorkflowRun(context, octokit, runId, runAttempt) {
+    if (runAttempt !== undefined) {
+        // The jobs of exactly this attempt, whatever attempts have started since.
+        return await octokit.paginate(octokit.rest.actions.listJobsForWorkflowRunAttempt, {
+            ...context.repo,
+            run_id: runId,
+            attempt_number: runAttempt,
+            per_page: 100,
+        });
+    }
     return await octokit.paginate(octokit.rest.actions.listJobsForWorkflowRun, {
         ...context.repo,
         run_id: runId,
@@ -77206,12 +77223,12 @@ class DeterministicIdGenerator {
 function isOctokitError(err) {
     return !!err && typeof err === "object" && "status" in err;
 }
-async function fetchGithub(token, runId) {
+async function fetchGithub(token, runId, runAttempt) {
     const octokit = getOctokit(token);
     info(`Get workflow run for ${runId}`);
-    const workflowRun = await getWorkflowRun(context$1, octokit, runId);
+    const workflowRun = await getWorkflowRun(context$1, octokit, runId, runAttempt);
     info("Get jobs");
-    const jobs = await listJobsForWorkflowRun(context$1, octokit, runId);
+    const jobs = await listJobsForWorkflowRun(context$1, octokit, runId, runAttempt);
     info("Get job annotations");
     const jobsId = (jobs ?? []).map((job) => job.id);
     let jobAnnotations = {};
@@ -77242,12 +77259,23 @@ async function fetchGithub(token, runId) {
     }
     return { workflowRun, jobs, jobAnnotations, prLabels };
 }
+function parseRunAttempt(input) {
+    if (input === "") {
+        return undefined;
+    }
+    const attempt = Number(input);
+    if (!Number.isInteger(attempt) || attempt < 1) {
+        throw new Error(`runAttempt must be a positive integer, got "${input}"`);
+    }
+    return attempt;
+}
 async function run() {
     try {
         const otlpEndpoint = getInput("otlpEndpoint");
         const otlpHeaders = getInput("otlpHeaders");
         const otelServiceName = getInput("otelServiceName") || process.env["OTEL_SERVICE_NAME"] || "";
         const runId = Number.parseInt(getInput("runId") || `${context$1.runId}`, 10);
+        const runAttempt = parseRunAttempt(getInput("runAttempt"));
         const extraAttributes = stringToRecord(getInput("extraAttributes"));
         const ghToken = getInput("githubToken") || process.env["GITHUB_TOKEN"] || "";
         const otlpInsecureSkipVerify = getBooleanInput("otlpInsecureSkipVerify");
@@ -77255,7 +77283,7 @@ async function run() {
             warning("TLS certificate verification is disabled for the OTLP exporter.");
         }
         info("Use Github API to fetch workflow data");
-        const { workflowRun, jobs, jobAnnotations, prLabels } = await fetchGithub(ghToken, runId);
+        const { workflowRun, jobs, jobAnnotations, prLabels } = await fetchGithub(ghToken, runId, runAttempt);
         info(`Create tracer provider for ${otlpEndpoint}`);
         const attributes = {
             [ATTR_SERVICE_NAME]: otelServiceName || workflowRun.name || `${workflowRun.workflow_id}`,
