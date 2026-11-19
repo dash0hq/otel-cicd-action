@@ -12,14 +12,14 @@ function isOctokitError(err: unknown): err is RequestError {
   return !!err && typeof err === "object" && "status" in err;
 }
 
-async function fetchGithub(token: string, runId: number) {
+async function fetchGithub(token: string, runId: number, runAttempt?: number) {
   const octokit = getOctokit(token);
 
   core.info(`Get workflow run for ${runId}`);
-  const workflowRun = await getWorkflowRun(context, octokit, runId);
+  const workflowRun = await getWorkflowRun(context, octokit, runId, runAttempt);
 
   core.info("Get jobs");
-  const jobs = await listJobsForWorkflowRun(context, octokit, runId);
+  const jobs = await listJobsForWorkflowRun(context, octokit, runId, runAttempt);
 
   core.info("Get job annotations");
   const jobsId = (jobs ?? []).map((job) => job.id);
@@ -50,12 +50,24 @@ async function fetchGithub(token: string, runId: number) {
   return { workflowRun, jobs, jobAnnotations, prLabels };
 }
 
+function parseRunAttempt(input: string): number | undefined {
+  if (input === "") {
+    return undefined;
+  }
+  const attempt = Number(input);
+  if (!Number.isInteger(attempt) || attempt < 1) {
+    throw new Error(`runAttempt must be a positive integer, got "${input}"`);
+  }
+  return attempt;
+}
+
 async function run() {
   try {
     const otlpEndpoint = core.getInput("otlpEndpoint");
     const otlpHeaders = core.getInput("otlpHeaders");
     const otelServiceName = core.getInput("otelServiceName") || process.env["OTEL_SERVICE_NAME"] || "";
     const runId = Number.parseInt(core.getInput("runId") || `${context.runId}`, 10);
+    const runAttempt = parseRunAttempt(core.getInput("runAttempt"));
     const extraAttributes = stringToRecord(core.getInput("extraAttributes"));
     const ghToken = core.getInput("githubToken") || process.env["GITHUB_TOKEN"] || "";
     const otlpInsecureSkipVerify = core.getBooleanInput("otlpInsecureSkipVerify");
@@ -65,7 +77,7 @@ async function run() {
     }
 
     core.info("Use Github API to fetch workflow data");
-    const { workflowRun, jobs, jobAnnotations, prLabels } = await fetchGithub(ghToken, runId);
+    const { workflowRun, jobs, jobAnnotations, prLabels } = await fetchGithub(ghToken, runId, runAttempt);
 
     core.info(`Create tracer provider for ${otlpEndpoint}`);
     const attributes: Attributes = {
@@ -98,4 +110,4 @@ async function run() {
   }
 }
 
-export { isOctokitError, run };
+export { isOctokitError, parseRunAttempt, run };

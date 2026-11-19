@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Optional `runAttempt` input: export that attempt of the run (its run and its jobs) instead of the
+  run's latest attempt. A workflow triggered by `workflow_run` can pass
+  `${{ github.event.workflow_run.run_attempt }}`, so a re-run that starts before the export reads
+  the run neither replaces nor duplicates the attempt that triggered it. Without it, behavior is
+  unchanged.
+
 ## [4.2.0] - 2026-09-18
 
 ### Changed

@@ -135,3 +135,18 @@ describe("run", () => {
     expect(core.setOutput).not.toHaveBeenCalled();
   }, 10_000);
 });
+
+describe("parseRunAttempt", () => {
+  it("is undefined when the input is empty, so the latest attempt is read", async () => {
+    const { parseRunAttempt } = await import("./runner");
+    expect(parseRunAttempt("")).toBeUndefined();
+  });
+  it("is the attempt number", async () => {
+    const { parseRunAttempt } = await import("./runner");
+    expect(parseRunAttempt("2")).toBe(2);
+  });
+  it.each(["0", "-1", "1.5", "two"])("refuses %s", async (input) => {
+    const { parseRunAttempt } = await import("./runner");
+    expect(() => parseRunAttempt(input)).toThrow("runAttempt must be a positive integer");
+  });
+});
