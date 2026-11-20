@@ -23,8 +23,10 @@ name: Synchronize CI/CD Action docs to dash0.com/docs
 # SYNC_DOCUMENTATION_TARGET_DIRECTORY secrets. sync-docs-action v0.4.0 removed its defaults for both, so the
 # (non-public) target repo name and its internal layout are not hardcoded here.
 #
-# Authentication to the target repository is done via the DASH0_DOCS_REPO_GITHUB_PAT secret. This must be a
-# fine-grained personal access token scoped to the target repository with the following repository permissions:
+# Authentication to the target repository is done via a short-lived installation token of the GitHub App
+# "Dash0 Docs Sync" (dash0-docs-sync), which is installed only on the target repository. The token is minted per run
+# from the DOCS_SYNC_APP_CLIENT_ID organization variable and the DOCS_SYNC_APP_PRIVATE_KEY organization secret, with
+# the following repository permissions:
 # - Contents: Read and write (to push the branch)
 # - Pull requests: Read and write (to open the PR)
 
@@ -65,6 +67,17 @@ jobs:
       - name: checkout otel-cicd-action
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6
 
+      - name: create GitHub App token for the documentation repository
+        id: app-token
+        if: env.DRY_RUN != 'true'
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ vars.DOCS_SYNC_APP_CLIENT_ID }}
+          private-key: ${{ secrets.DOCS_SYNC_APP_PRIVATE_KEY }}
+          repositories: ${{ secrets.SYNC_DOCUMENTATION_TARGET_REPOSITORY }}
+          permission-contents: write
+          permission-pull-requests: write
+
       # Single invocation for both modes. On a dry run the action applies the transformations, then stops before
       # touching the target repository; the target-side inputs are ignored, so they can be supplied unconditionally.
       - name: synchronize docs to the website
@@ -74,7 +87,7 @@ jobs:
           transformations-file: .github/workflows/sync-docs/transformations.yaml
           target-repository: ${{ secrets.SYNC_DOCUMENTATION_TARGET_REPOSITORY }}
           target-directory: ${{ secrets.SYNC_DOCUMENTATION_TARGET_DIRECTORY }}
-          target-github-token: ${{ secrets.DASH0_DOCS_REPO_GITHUB_PAT }}
+          target-github-token: ${{ steps.app-token.outputs.token }}
           pr-branch: sync-otel-cicd-action-docs
           pr-title: "docs: synchronize CI/CD Action documentation"
           pr-body: >-
